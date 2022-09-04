@@ -1,8 +1,7 @@
 package com.maveric.userservice.service;
 
 import com.maveric.userservice.dto.UserResponse;
-import com.maveric.userservice.exceptionhandler.UserNotExist;
-import com.maveric.userservice.model.User;
+
 
 import java.util.List;
 
@@ -14,9 +13,7 @@ public interface UserService {
 
     public String deleteUser(String userId);
 
-    public UserResponse  getUserDetailsByEmail(String email);
+    public UserResponse getUserDetailsByEmail(String emailId);
 
-    public UserResponse updateUser(long userId, User user) throws UserNotExist;
-
-
+    public UserResponse updateUser(String userId,UserResponse userResponse);
 }
