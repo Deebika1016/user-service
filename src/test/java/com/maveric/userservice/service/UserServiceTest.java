@@ -1,7 +1,7 @@
 package com.maveric.userservice.service;
 
 
-import com.maveric.userservice.dto.UserResponse;
+import com.maveric.userservice.dto.UserDto;
 import com.maveric.userservice.enumeration.Gender;
 import com.maveric.userservice.mapper.UserMapper;
 import com.maveric.userservice.model.User;
@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
@@ -43,14 +44,16 @@ public class UserServiceTest {
 
     @Mock
     private Page pageResult;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
 
     @Test
     public void testCreateUser() throws Exception{
-        when(mapper.map(any(UserResponse.class))).thenReturn(getUser());
+        when(mapper.map(any(UserDto.class))).thenReturn(getUser());
         when(mapper.map(any(User.class))).thenReturn(getUserDto());
         when(repository.save(any())).thenReturn(getUser());
-        UserResponse userDto = service.createUser(getUserDto());
+        UserDto userDto = service.createUser(getUserDto());
         assertSame(userDto.getFirstName(), getUser().getFirstName());
     }
 
@@ -61,20 +64,24 @@ public class UserServiceTest {
         when(pageResult.hasContent()).thenReturn(true);
         when(pageResult.getContent()).thenReturn(Arrays.asList(getUser(),getUser()));
         when(mapper.mapToDto(any())).thenReturn(Arrays.asList(getUserDto(),getUserDto()));
+        List<UserDto> users = service.getUsers(1,1);
 
-        List<UserResponse> users = service.getUsers(1,1);
-
-        assertEquals("Deebika", users.get(0).getFirstName());
-        assertEquals(Gender.FEMALE, users.get(1).getGender());
+        assertEquals("karthick", users.get(0).getFirstName());
+        assertEquals(Gender.MALE, users.get(1).getGender());
     }
 
     @Test
     public void testGetUserById() {
         when(repository.findById("2")).thenReturn(Optional.of(getUser()));
         when(mapper.map(any(User.class))).thenReturn(getUserDto());
-
-        UserResponse userDto = service.getUserDetails("2");
-
+        UserDto userDto = service.getUserDetails("2");
+        assertSame(userDto.getFirstName(),getUserDto().getFirstName());
+    }
+    @Test
+    public void testGetUserByEmail() {
+        when(repository.findByEmail("test@gmail.com")).thenReturn(getUser());
+        when(mapper.map(any(User.class))).thenReturn(getUserDto());
+        UserDto userDto = service.getUserDetailsByEmail("test@gmail.com");
         assertSame(userDto.getFirstName(),getUserDto().getFirstName());
     }
 
@@ -88,6 +95,14 @@ public class UserServiceTest {
 
         assertSame( "User deleted successfully.",userDto);
     }
+    @Test
+    public void testUpdateUserById() {
+        when(repository.findById("123")).thenReturn(Optional.ofNullable(getUser()));
+        when(mapper.map(any(User.class))).thenReturn(getUserDto());
+        when(repository.save(any())).thenReturn(getUser());UserDto userDto = service.updateUser("123",getUserDto());
+        assertSame(userDto.getAddress(),getUserDto().getAddress());
+    }
+
 
 
 }

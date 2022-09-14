@@ -1,4 +1,5 @@
 package com.maveric.userservice.constants;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -12,23 +13,23 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 
-public class DateDeSerializer extends StdDeserializer<LocalDateTime> {
+public class DateDeSerializer extends StdDeserializer<LocalDate> {
     public DateDeSerializer() {
         super(Date.class);
     }
 
     @Override
-    public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
+    public LocalDate deserialize(JsonParser p, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
         String value = p.readValueAs(String.class);
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            System.out.println("formatter"+formatter);
-            LocalDate date = LocalDate.parse(value, formatter);
+            //System.out.println("formatter"+formatter);
+            LocalDate date = LocalDate.parse(value,formatter);
             LocalDateTime localDateTime = date.atStartOfDay();
 
-            System.out.println("date"+date);
-            return localDateTime;
+            System.out.println("date="+localDateTime);
+            return date;
         } catch (DateTimeParseException e) {
 
             System.out.println("Exception "+e);
@@ -36,4 +37,3 @@ public class DateDeSerializer extends StdDeserializer<LocalDateTime> {
         }
     }
 }
-

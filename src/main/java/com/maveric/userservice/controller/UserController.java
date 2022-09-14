@@ -1,6 +1,7 @@
 package com.maveric.userservice.controller;
 
-import com.maveric.userservice.dto.UserResponse;
+import com.maveric.userservice.dto.UserDto;
+import com.maveric.userservice.exception.UserNotFoundException;
 import com.maveric.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,48 +11,54 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1")
 @RestController
 public class UserController {
 
     @Autowired
     UserService userService;
-
-    @GetMapping("")
-    public ResponseEntity<List<UserResponse>> getUsers(@RequestParam(defaultValue = "0") Integer page,@RequestParam(defaultValue = "10") Integer pageSize){
-        List<UserResponse> userResponses = userService.getUsers(page,pageSize);
-        return new ResponseEntity<List<UserResponse>>(userResponses, HttpStatus.OK);
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("users")
+    public ResponseEntity<List<UserDto>> getUsers(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize){
+        List<UserDto> userRespons = userService.getUsers(page,pageSize);
+        return new ResponseEntity<>(userRespons, HttpStatus.OK);
     }
-
-    @PostMapping("")
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserResponse userResponse) {
-        UserResponse userDtoResponse = userService.createUser(userResponse);
-        return new ResponseEntity<UserResponse>(userDtoResponse, HttpStatus.CREATED);
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PostMapping("users")
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+        UserDto userDtoResponse = userService.createUser(userDto);
+        return new ResponseEntity<>(userDtoResponse, HttpStatus.CREATED);
     }
-
-    @GetMapping("{userId}")
-    public ResponseEntity<UserResponse> getUserDetails(@PathVariable String userId) {
-        UserResponse userDtoResponse = userService.getUserDetails(userId);
-        return new ResponseEntity<UserResponse>(userDtoResponse, HttpStatus.OK);
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("users/{userId}")
+    public ResponseEntity<UserDto> getUserDetails(@PathVariable String userId) {
+        UserDto userDtoResponse = userService.getUserDetails(userId);
+        return new ResponseEntity<>(userDtoResponse, HttpStatus.OK);
 
     }
-
-    @DeleteMapping("/{userId}")
+    @CrossOrigin(origins = "http://localhost:4200")
+    @DeleteMapping("users/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable String userId) {
         String result = userService.deleteUser(userId);
-        return new ResponseEntity<String>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
-    @PutMapping("{userId}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId,@RequestBody UserResponse userResponse) {
-        UserResponse balanceDtoResponse = userService.updateUser(userId,userResponse);
-        return new ResponseEntity<>(balanceDtoResponse, HttpStatus.OK);
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PutMapping("users/{userId}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable String userId, @RequestBody UserDto userDto) {
+        if(userId.equals(userDto.get_id())) {
+            UserDto userDto1 = userService.updateUser(userId, userDto);
+            return new ResponseEntity<>(userDto1, HttpStatus.OK);
+        }
+        else
+        {
+            throw new UserNotFoundException("Requested User not found id " + userDto.get_id());
+        }
     }
-
-    @GetMapping("getUserByEmail/{emailId}")
-    public ResponseEntity<UserResponse> getUserDetailsByEmail(@PathVariable String emailId) {
-        UserResponse userDtoResponse = userService.getUserDetailsByEmail(emailId);
-        return new ResponseEntity<UserResponse>(userDtoResponse, HttpStatus.OK);
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("users/getUserByEmail/{emailId}")
+    public ResponseEntity<UserDto> getUserDetailsByEmail(@PathVariable String emailId) {
+        UserDto userDtoResponse = userService.getUserDetailsByEmail(emailId);
+        return new ResponseEntity<>(userDtoResponse, HttpStatus.OK);
 
     }
 }
