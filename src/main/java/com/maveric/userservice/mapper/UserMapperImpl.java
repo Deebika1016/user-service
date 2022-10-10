@@ -4,8 +4,6 @@ package com.maveric.userservice.mapper;
 import com.maveric.userservice.dto.UserDto;
 import com.maveric.userservice.model.User;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,18 +66,21 @@ public class UserMapperImpl implements UserMapper {
 
     @Override
     public List<UserDto> mapToDto(List<User> users) {
-        return users.stream().map(userDto -> new UserDto(
-                userDto.get_id(),
-                userDto.getFirstName(),
-                userDto.getLastName(),
-                userDto.getMiddleName(),
-                userDto.getPhoneNumber(),
-                userDto.getEmail(),
-                userDto.getAddress(),
-                userDto.getDateOfBirth(),
-                userDto.getGender(),
-                userDto.getRole(),
-                userDto.getPassword()
-        )).toList();
+        if(!users.isEmpty())
+            return users.stream().map(userDto -> new UserDto(
+                    userDto.get_id(),
+                    userDto.getFirstName(),
+                    userDto.getLastName(),
+                    userDto.getMiddleName(),
+                    userDto.getPhoneNumber(),
+                    userDto.getEmail(),
+                    userDto.getAddress(),
+                    userDto.getDateOfBirth(),
+                    userDto.getGender(),
+                    userDto.getRole(),
+                    userDto.getPassword()
+            )).toList();
+        else
+            return Collections.<UserDto>emptyList();
     }
 }
