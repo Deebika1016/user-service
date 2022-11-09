@@ -1,13 +1,12 @@
 package com.maveric.userservice.controller;
-
 import com.maveric.userservice.dto.UserDto;
 import com.maveric.userservice.service.UserService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.util.List;
 
@@ -40,7 +39,6 @@ public class UserController {
     public ResponseEntity<UserDto> getUserDetails(@PathVariable String userId) {
         log.info("API call returning list of User details for the given valid UserId");
         UserDto userDtoResponse = userService.getUserDetails(userId);
-        //userDtoResponse.setPassword(null);
         return new ResponseEntity<>(userDtoResponse, HttpStatus.OK);
 
     }
@@ -54,12 +52,13 @@ public class UserController {
     }
     /* Update User by UserId */
     @PutMapping("users/{userId}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable String userId, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable String userId,@Validated(UserDto.ValidationStepOne.class) @RequestBody UserDto userDto) {
         log.info("API call to Update User for valid userId");
-            UserDto userDto1 = userService.updateUser(userId, userDto);
-            log.info("User information Updated successfully");
-            return new ResponseEntity<>(userDto1, HttpStatus.OK);
-        }
+        UserDto userDto1 = userService.updateUser(userId, userDto);
+        log.info("User information Updated successfully");
+        userDto1.setPassword(null);
+        return new ResponseEntity<>(userDto1, HttpStatus.OK);
+    }
     /* Returns list details by emailId */
     @GetMapping("users/getUserByEmail/{emailId}")
     public ResponseEntity<UserDto> getUserDetailsByEmail(@PathVariable String emailId) {
